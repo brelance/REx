@@ -1,0 +1,832 @@
+{
+    "GET /users/me": {
+        "description": "Retrieves information about the user who is currently authenticated.",
+        "parameters": {
+            "query": {
+                "fields": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of fields to include in the response"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/users/me\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "GET /search": {
+        "description": "Searches for files, folders, and web links.",
+        "parameters": {
+            "query": {
+                "query": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The search term to look for"
+                },
+                "type": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Filter by type: file, folder, or web_link"
+                },
+                "file_extensions": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of file extensions to filter by"
+                },
+                "ancestor_folder_ids": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated folder IDs to limit search scope"
+                },
+                "content_types": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Filter by content type: name, description, file_content, comments, tag"
+                },
+                "limit": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Maximum number of results to return (default: 30, max: 200)"
+                },
+                "offset": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Pagination offset"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/search?query=report\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "POST /folders": {
+        "description": "Creates a new empty folder within the specified parent folder.",
+        "parameters": {
+            "body": {
+                "name": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The name for the new folder"
+                },
+                "parent": {
+                    "type": "object",
+                    "required": true,
+                    "description": "The parent folder object"
+                },
+                "parent.id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The ID of the parent folder (use '0' for root)"
+                }
+            }
+        },
+        "example_request": "curl -i -X POST \"https://api.box.com/2.0/folders\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"content-type: application/json\" \\\n     -d '{\n       \"name\": \"New Folder\",\n       \"parent\": {\n         \"id\": \"0\"\n       }\n     }'"
+    },
+    "GET /folders/{folder_id}": {
+        "description": "Retrieves details for a folder, including the first 100 entries in the folder.",
+        "parameters": {
+            "path": {
+                "folder_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the folder. Use '0' for root folder."
+                }
+            },
+            "query": {
+                "fields": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of fields to include"
+                },
+                "sort": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Sort by: id, name, or date"
+                },
+                "direction": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Sort direction: ASC or DESC"
+                },
+                "offset": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Pagination offset"
+                },
+                "limit": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Maximum items to return (max: 1000)"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/folders/12345\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "PUT /folders/{folder_id}": {
+        "description": "Updates a folder. Can be used to rename or move a folder, or to add it to a collection.",
+        "parameters": {
+            "path": {
+                "folder_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the folder"
+                }
+            },
+            "header": {
+                "If-Match": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Conditional update - fails with 412 if etag doesn't match"
+                }
+            },
+            "body": {
+                "name": {
+                    "type": "string",
+                    "required": false,
+                    "description": "New name for the folder"
+                },
+                "description": {
+                    "type": "string",
+                    "required": false,
+                    "description": "New description"
+                },
+                "parent": {
+                    "type": "object",
+                    "required": false,
+                    "description": "{\"id\": \"new_parent_id\"} to move the folder"
+                },
+                "tags": {
+                    "type": "array",
+                    "required": false,
+                    "description": "Array of tag strings"
+                },
+                "collections": {
+                    "type": "array",
+                    "required": false,
+                    "description": "Array of collection objects to add/remove folder from"
+                }
+            }
+        },
+        "example_request": "curl -i -X PUT \"https://api.box.com/2.0/folders/12345\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"content-type: application/json\" \\\n     -d '{\n       \"name\": \"New folder name\"\n     }'"
+    },
+    "DELETE /folders/{folder_id}": {
+        "description": "Deletes a folder, either permanently or by moving it to the trash.",
+        "parameters": {
+            "path": {
+                "folder_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the folder"
+                }
+            },
+            "query": {
+                "recursive": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "If true, delete a non-empty folder recursively"
+                }
+            },
+            "header": {
+                "If-Match": {
+                    "type": "string",
+                    "required": false,
+                    "description": "ETag value for precondition check"
+                }
+            }
+        },
+        "example_request": "curl -i -X DELETE \"https://api.box.com/2.0/folders/12345\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "GET /folders/{folder_id}/items": {
+        "description": "Retrieves a page of items in a folder. These items can be files, folders, and web links.",
+        "parameters": {
+            "path": {
+                "folder_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The folder ID. Use '0' for root folder."
+                }
+            },
+            "query": {
+                "fields": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of fields"
+                },
+                "limit": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Max number of items (default: 100, max: 1000)"
+                },
+                "offset": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Offset for pagination"
+                },
+                "sort": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Sort by: id, name, or date"
+                },
+                "direction": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Sort direction: ASC or DESC"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/folders/12345/items\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "POST /files/content": {
+        "description": "Uploads a small file to Box. For file sizes over 50MB use the Chunk Upload APIs.",
+        "parameters": {
+            "body": {
+                "attributes": {
+                    "type": "JSON",
+                    "required": true,
+                    "description": "File attributes including name and parent. Must come BEFORE the file part."
+                },
+                "attributes.name": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The name of the file"
+                },
+                "attributes.parent.id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The ID of the parent folder"
+                },
+                "file": {
+                    "type": "binary",
+                    "required": true,
+                    "description": "The binary file content"
+                }
+            }
+        },
+        "example_request": "curl -i -X POST \"https://upload.box.com/api/2.0/files/content\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"content-type: multipart/form-data\" \\\n     -F attributes='{\"name\":\"Contract.pdf\", \"parent\":{\"id\":\"11446498\"}}' \\\n     -F file=@<FILE_NAME>"
+    },
+    "GET /files/{file_id}": {
+        "description": "Retrieves the details about a file.",
+        "parameters": {
+            "path": {
+                "file_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the file"
+                }
+            },
+            "query": {
+                "fields": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of fields to include"
+                }
+            },
+            "header": {
+                "If-None-Match": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Return 304 if etag matches (conditional GET)"
+                },
+                "boxapi": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Shared link access header"
+                },
+                "x-rep-hints": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Representation hints"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/files/12345\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "PUT /files/{file_id}": {
+        "description": "Updates a file. Can be used to rename or move a file, create a shared link, or lock a file.",
+        "parameters": {
+            "path": {
+                "file_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the file"
+                }
+            },
+            "header": {
+                "If-Match": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Conditional update - fails with 412 if etag doesn't match"
+                }
+            },
+            "body": {
+                "name": {
+                    "type": "string",
+                    "required": false,
+                    "description": "New name for the file"
+                },
+                "description": {
+                    "type": "string",
+                    "required": false,
+                    "description": "New description"
+                },
+                "parent": {
+                    "type": "object",
+                    "required": false,
+                    "description": "{\"id\": \"folder_id\"} to move file"
+                },
+                "tags": {
+                    "type": "array",
+                    "required": false,
+                    "description": "Array of tag strings"
+                },
+                "lock": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Lock settings for the file"
+                },
+                "collections": {
+                    "type": "array",
+                    "required": false,
+                    "description": "Array of collection objects"
+                }
+            }
+        },
+        "example_request": "curl -i -X PUT \"https://api.box.com/2.0/files/12345\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"content-type: application/json\" \\\n     -d '{\n       \"name\": \"new-filename.pdf\"\n     }'"
+    },
+    "DELETE /files/{file_id}": {
+        "description": "Deletes a file, either permanently or by moving it to the trash.",
+        "parameters": {
+            "path": {
+                "file_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the file"
+                }
+            },
+            "header": {
+                "If-Match": {
+                    "type": "string",
+                    "required": false,
+                    "description": "ETag value for precondition check"
+                }
+            }
+        },
+        "example_request": "curl -i -X DELETE \"https://api.box.com/2.0/files/12345\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "GET /files/{file_id}/content": {
+        "description": "Returns the contents of a file in binary format.",
+        "parameters": {
+            "path": {
+                "file_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the file"
+                }
+            },
+            "query": {
+                "version": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Specific file version to download"
+                }
+            }
+        },
+        "example_request": "curl -i -L -X GET \"https://api.box.com/2.0/files/12345/content\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "POST /files/{file_id}/content": {
+        "description": "Update a file's content. For file sizes over 50MB use the Chunk Upload APIs.",
+        "parameters": {
+            "path": {
+                "file_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the file to update"
+                }
+            },
+            "header": {
+                "If-Match": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Conditional update - fails with 412 if etag doesn't match"
+                }
+            },
+            "body": {
+                "attributes": {
+                    "type": "JSON",
+                    "required": false,
+                    "description": "File attributes. Must come BEFORE the file part."
+                },
+                "attributes.name": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Optional new name for the file"
+                },
+                "file": {
+                    "type": "binary",
+                    "required": true,
+                    "description": "The binary file content"
+                }
+            }
+        },
+        "example_request": "curl -i -X POST \"https://upload.box.com/api/2.0/files/12345/content\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"content-type: multipart/form-data\" \\\n     -F attributes='{\"name\":\"Contract_v2.pdf\"}' \\\n     -F file=@<FILE_NAME>"
+    },
+    "GET /files/{file_id}/comments": {
+        "description": "Retrieves a list of comments for a file.",
+        "parameters": {
+            "path": {
+                "file_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the file"
+                }
+            },
+            "query": {
+                "fields": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of fields"
+                },
+                "limit": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Max number of comments to return"
+                },
+                "offset": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Pagination offset"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/files/12345/comments\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "GET /files/{file_id}/tasks": {
+        "description": "Retrieves a list of all the tasks for a file.",
+        "parameters": {
+            "path": {
+                "file_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the file"
+                }
+            },
+            "query": {
+                "fields": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of fields to include"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/files/12345/tasks\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "POST /comments": {
+        "description": "Adds a comment by the user to a specific file, or as a reply to another comment.",
+        "parameters": {
+            "body": {
+                "item": {
+                    "type": "object",
+                    "required": true,
+                    "description": "The item to comment on"
+                },
+                "item.type": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Either 'file' or 'comment' (for replies)"
+                },
+                "item.id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The ID of the file or parent comment"
+                },
+                "message": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The text of the comment"
+                },
+                "tagged_message": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Message with @mentions using @[userid:name] format"
+                }
+            }
+        },
+        "example_request": "curl -i -X POST \"https://api.box.com/2.0/comments\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"content-type: application/json\" \\\n     -d '{\n       \"message\": \"Review completed!\",\n       \"item\": {\n         \"type\": \"file\",\n         \"id\": \"12345\"\n       }\n     }'"
+    },
+    "POST /tasks": {
+        "description": "Creates a single task on a file. This task is not assigned to any user and will need to be assigned separately.",
+        "parameters": {
+            "body": {
+                "item": {
+                    "type": "object",
+                    "required": true,
+                    "description": "The file to create task on"
+                },
+                "item.type": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Must be 'file'"
+                },
+                "item.id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The file ID"
+                },
+                "action": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Task action: 'review' (default) or 'complete'"
+                },
+                "message": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Task description"
+                },
+                "due_at": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Due date (ISO 8601 format)"
+                },
+                "completion_rule": {
+                    "type": "string",
+                    "required": false,
+                    "description": "'all_assignees' (default) or 'any_assignee'"
+                }
+            }
+        },
+        "example_request": "curl -i -X POST \"https://api.box.com/2.0/tasks\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"content-type: application/json\" \\\n     -d '{\n       \"item\": {\n         \"type\": \"file\",\n         \"id\": \"12345\"\n       },\n       \"action\": \"review\",\n       \"message\": \"Please review this document\"\n     }'"
+    },
+    "GET /hubs": {
+        "description": "Retrieves all Box Hubs for requesting user.",
+        "parameters": {
+            "header": {
+                "box-version": {
+                    "type": "string",
+                    "required": true,
+                    "description": "API version header. Must be '2025.0'"
+                }
+            },
+            "query": {
+                "query": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Search query for hubs"
+                },
+                "scope": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Filter: 'editable', 'view_only', or 'all' (default)"
+                },
+                "sort": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Sort by: 'name', 'updated_at', 'last_accessed_at', 'view_count', 'relevance'"
+                },
+                "direction": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Sort direction: 'ASC' or 'DESC'"
+                },
+                "marker": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Pagination marker"
+                },
+                "limit": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Max items per page"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/hubs\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"box-version: 2025.0\""
+    },
+    "POST /hubs": {
+        "description": "Creates a new Box Hub.",
+        "parameters": {
+            "header": {
+                "box-version": {
+                    "type": "string",
+                    "required": true,
+                    "description": "API version header. Must be '2025.0'"
+                }
+            },
+            "body": {
+                "title": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Hub title (max 50 characters)"
+                },
+                "description": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Hub description"
+                }
+            }
+        },
+        "example_request": "curl -i -X POST \"https://api.box.com/2.0/hubs\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"box-version: 2025.0\" \\\n     -H \"content-type: application/json\" \\\n     -d '{\n       \"title\": \"Research Center\",\n       \"description\": \"Central hub for research materials\"\n     }'"
+    },
+    "GET /hubs/{hub_id}": {
+        "description": "Retrieves details for a Box Hub by its ID.",
+        "parameters": {
+            "path": {
+                "hub_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the hub"
+                }
+            },
+            "header": {
+                "box-version": {
+                    "type": "string",
+                    "required": true,
+                    "description": "API version header. Must be '2025.0'"
+                }
+            },
+            "query": {
+                "fields": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of fields to include"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/hubs/12345\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"box-version: 2025.0\""
+    },
+    "PUT /hubs/{hub_id}": {
+        "description": "Updates a Box Hub. Can be used to change title, description, or Box Hub settings.",
+        "parameters": {
+            "path": {
+                "hub_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the hub"
+                }
+            },
+            "header": {
+                "box-version": {
+                    "type": "string",
+                    "required": true,
+                    "description": "API version header. Must be '2025.0'"
+                }
+            },
+            "body": {
+                "title": {
+                    "type": "string",
+                    "required": false,
+                    "description": "New title for the hub"
+                },
+                "description": {
+                    "type": "string",
+                    "required": false,
+                    "description": "New description"
+                },
+                "is_ai_enabled": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Enable/disable AI features"
+                }
+            }
+        },
+        "example_request": "curl -i -X PUT \"https://api.box.com/2.0/hubs/12345\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"box-version: 2025.0\" \\\n     -H \"content-type: application/json\" \\\n     -d '{\n       \"title\": \"Updated Research Center\"\n     }'"
+    },
+    "GET /hub_items": {
+        "description": "Retrieves all items associated with a Box Hub.",
+        "parameters": {
+            "header": {
+                "box-version": {
+                    "type": "string",
+                    "required": true,
+                    "description": "API version header. Must be '2025.0'"
+                }
+            },
+            "query": {
+                "hub_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The hub ID to get items for"
+                },
+                "marker": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Pagination marker"
+                },
+                "limit": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Max results per page"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/hub_items?hub_id=12345\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"box-version: 2025.0\""
+    },
+    "POST /hubs/{hub_id}/manage_items": {
+        "description": "Adds and/or removes Box Hub items from a Box Hub.",
+        "parameters": {
+            "path": {
+                "hub_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the hub"
+                }
+            },
+            "header": {
+                "box-version": {
+                    "type": "string",
+                    "required": true,
+                    "description": "API version header. Must be '2025.0'"
+                }
+            },
+            "body": {
+                "operations": {
+                    "type": "array",
+                    "required": true,
+                    "description": "Array of operations to perform"
+                },
+                "operations[].action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "'add' or 'remove'"
+                },
+                "operations[].item": {
+                    "type": "object",
+                    "required": true,
+                    "description": "Item object to add/remove"
+                },
+                "operations[].item.type": {
+                    "type": "string",
+                    "required": true,
+                    "description": "'file' or 'folder'"
+                },
+                "operations[].item.id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The item ID"
+                }
+            }
+        },
+        "example_request": "curl -i -X POST \"https://api.box.com/2.0/hubs/12345/manage_items\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\" \\\n     -H \"box-version: 2025.0\" \\\n     -H \"content-type: application/json\" \\\n     -d '{\n       \"operations\": [\n         {\n           \"action\": \"add\",\n           \"item\": {\n             \"type\": \"file\",\n             \"id\": \"11111\"\n           }\n         }\n       ]\n     }'"
+    },
+    "GET /collections": {
+        "description": "Retrieves all collections for a given user. Currently, only the 'favorites' collection is supported.",
+        "parameters": {
+            "query": {
+                "fields": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of fields"
+                },
+                "offset": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Pagination offset"
+                },
+                "limit": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Maximum items per page"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/collections\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "GET /collections/{collection_id}": {
+        "description": "Retrieves a collection by its ID.",
+        "parameters": {
+            "path": {
+                "collection_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the collection"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/collections/11111\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    },
+    "GET /collections/{collection_id}/items": {
+        "description": "Retrieves the files and/or folders contained within this collection.",
+        "parameters": {
+            "path": {
+                "collection_id": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The unique identifier of the collection"
+                }
+            },
+            "query": {
+                "fields": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Comma-separated list of fields"
+                },
+                "offset": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Pagination offset"
+                },
+                "limit": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Maximum items per page"
+                }
+            }
+        },
+        "example_request": "curl -i -X GET \"https://api.box.com/2.0/collections/11111/items\" \\\n     -H \"authorization: Bearer <ACCESS_TOKEN>\""
+    }
+}

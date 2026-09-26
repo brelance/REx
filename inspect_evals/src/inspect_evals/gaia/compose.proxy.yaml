@@ -1,0 +1,15 @@
+services:
+  default:
+    image: aisiuk/inspect-tool-support
+    init: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      HTTP_PROXY: "${GAIA_PROXY_URL:-http://host.docker.internal:7890}"
+      HTTPS_PROXY: "${GAIA_PROXY_URL:-http://host.docker.internal:7890}"
+      ALL_PROXY: "${GAIA_PROXY_URL:-http://host.docker.internal:7890}"
+      http_proxy: "${GAIA_PROXY_URL:-http://host.docker.internal:7890}"
+      https_proxy: "${GAIA_PROXY_URL:-http://host.docker.internal:7890}"
+      all_proxy: "${GAIA_PROXY_URL:-http://host.docker.internal:7890}"
+      NO_PROXY: "${GAIA_NO_PROXY:-localhost,127.0.0.1}"
+      no_proxy: "${GAIA_NO_PROXY:-localhost,127.0.0.1}"

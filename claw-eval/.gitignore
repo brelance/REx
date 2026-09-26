@@ -1,0 +1,55 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+env/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.tox/
+.nox/
+
+# Python packaging and coverage output
+*.egg-info/
+.eggs/
+build/
+dist/
+pip-wheel-metadata/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Benchmark runtime output
+/traces/
+/traces_*/
+/outputs/
+/results/
+
+# LaTeX build output
+*.md
+*.yaml
+
+# Generated submission archive
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Local agent workspace metadata
+/.agents/
+/.codex/
+tasks

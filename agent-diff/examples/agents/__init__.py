@@ -1,0 +1,55 @@
+"""Reusable agent scaffolds for Agent-Diff benchmark examples."""
+
+from .baselines import (
+    BaselineConfig,
+    BaselineMode,
+    ExplicitPlanExecuteAgent,
+    ExplicitPlanExecuteConfig,
+    RecapAction,
+    RecapAgent,
+    RecapComplete,
+    RecapConfig,
+    RecapDecompose,
+    RecapResponse,
+    ReflectionAgent,
+    ReflectionConfig,
+    run_baseline_agent,
+    run_explicit_plan_execute_agent,
+    run_recap_agent,
+    run_reflection_agent,
+)
+from .rex_runner import (
+    RExRunner,
+    RExConfig,
+    ModelTurn,
+    OpenAICompatibleModelClient,
+    run_rex_runner,
+)
+from .react import ReactConfig, parse_react_response, run_react_agent
+
+__all__ = [
+    "BaselineConfig",
+    "BaselineMode",
+    "ExplicitPlanExecuteAgent",
+    "ExplicitPlanExecuteConfig",
+    "RExRunner",
+    "RExConfig",
+    "ModelTurn",
+    "OpenAICompatibleModelClient",
+    "RecapAction",
+    "RecapAgent",
+    "RecapComplete",
+    "RecapConfig",
+    "RecapDecompose",
+    "RecapResponse",
+    "ReactConfig",
+    "ReflectionAgent",
+    "ReflectionConfig",
+    "run_baseline_agent",
+    "run_explicit_plan_execute_agent",
+    "run_rex_runner",
+    "parse_react_response",
+    "run_react_agent",
+    "run_recap_agent",
+    "run_reflection_agent",
+]

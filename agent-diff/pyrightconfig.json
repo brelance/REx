@@ -1,0 +1,9 @@
+{
+    "venvPath": "backend",
+    "pythonVersion": "3.14",
+    "venv": ".venv",
+    "extraPaths": [
+        "backend",
+        "sdk/agent-diff-python"
+    ]
+}
